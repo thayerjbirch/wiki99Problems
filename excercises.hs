@@ -65,7 +65,7 @@ data ListItem a = Single a | Multiple Int a
 modEncode :: (Eq a) => [a] -> [ListItem a]
 modEncode x = map helper $ myEncode x
     where helper (1,n) = Single n
-        helper (y,n) = Multiple y n
+          helper (y,n) = Multiple y n
        
 --Problem 12
 myDecode :: [ListItem a] -> [a]
@@ -73,5 +73,56 @@ myDecode y = concatMap decoder y
     where
         decoder (Single x)    = [x]
         decoder (Multiple n x) = replicate n x
-	   
+
 --Problem 13
+directEncode :: (Eq a) => [a] -> [(Int,a)]
+directEncode [] = []
+directEncode x = directEncodeHelper [] x
+
+directEncodeHelper :: (Eq a) => [(Int,a)] -> [a] -> [(Int,a)]
+directEncodeHelper result [] = result
+directEncodeHelper result [x] = result++[(1,x)]
+directEncodeHelper result (x:xs) = if x == (head xs)
+                                   then directEncodeHelper (result++[((length $ takeWhile(x==)xs) + 1,x)]) (dropWhile(x==)xs)
+                                   else directEncodeHelper (result++[(1,x)]) xs
+                                   
+--Problem 14
+--Duplicate the elements in a list
+dupli :: [a] -> [a]
+dupli listIn = foldr(\x acc -> x:x:acc) [] listIn 
+
+--Problem 15
+--Triplicate the elements in a list
+tripli :: [a] -> [a]
+tripli listIn = foldr(\x acc -> x:x:x:acc) [] listIn
+
+--Problem 16
+--Drop ever Nth element in a list
+dropNth :: Int -> [a] -> [a]
+dropNth n targetList = dropNthHelper targetList 0 (n - 1)
+
+dropNthHelper :: [a] -> Int -> Int -> [a]
+dropNthHelper [x] iter n    = if(iter == n)
+                              then []
+                              else [x]
+dropNthHelper (x:xs) iter n = if(iter == n)
+                              then dropNthHelper xs 0 n
+                              else x : dropNthHelper xs (iter + 1) n
+dropNthHelper _ iter n      = []
+
+--Problem 17
+--Split a list into two parts, the length of the first of which is given
+mySplit :: Int -> [a] -> ([a],[a])
+mySplit n xs = (map fst lowerList, map fst upperList)
+    where myList = xs `zip` [1..]
+          lowerList = filter(\x -> (snd x) <= n) myList
+          upperList = filter(\x -> (snd x) > n) myList
+          
+--Problem 18
+--Extract a slice from a list
+mySlice :: Int -> Int -> [a] -> [a]
+mySlice i j xs = helper 0 i j xs []
+    where helper count i j xs result
+            | count < i = helper (count + 1) i j (tail xs) result
+            | count >= i && count < j = helper (count + 1) i j (tail xs) (head xs : result)
+            | otherwise = []
