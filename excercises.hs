@@ -112,6 +112,7 @@ dropNthHelper _ iter n      = []
 
 --Problem 17
 --Split a list into two parts, the length of the first of which is given
+--This is inefficient but I wanted to play with zip
 mySplit :: Int -> [a] -> ([a],[a])
 mySplit n xs = (map fst lowerList, map fst upperList)
     where myList = xs `zip` [1..]
@@ -126,3 +127,34 @@ mySlice i j xs = helper 0 i j xs []
             | count < i = helper (count + 1) i j (tail xs) result
             | count >= i && count < j = helper (count + 1) i j (tail xs) (head xs : result)
             | otherwise = []
+            
+--Problem 19
+--Rotate a list N places to the left
+rotateN :: Int -> [a] -> [a]
+rotateN x listIn = snd splitList ++ fst splitList
+    where splitList = mySplit x listIn
+    
+--Problem 20
+--Remove the Kth element from a list
+removeNth :: Int -> [a] -> Maybe [a]
+removeNth x listIn = if(x <= length listIn)
+                     then Just (take (x - 1) listIn ++ drop x listIn)
+                     else Nothing
+                     
+--Problem 21
+--Insert an element at the Nth position
+insertAt :: Int -> a -> [a] -> Maybe [a]
+insertAt x elementIn listIn = if(x <= length listIn)
+                              then Just(take x listIn ++ elementIn : drop x listIn)
+                              else Nothing
+                              
+--Problem 22
+--Create a list containing all integers in a given range
+myRange :: Int -> Int -> [Int]
+myRange min max = helper min min max
+    where helper floor i cieling
+            | i <= cieling = i : (helper floor (i + 1) cieling)
+            | otherwise = []
+            
+--Problem 23
+--Extract a number of randomly selected elements from a list
